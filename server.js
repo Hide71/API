@@ -4,7 +4,7 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 const app = express()
-app.use(express.json)
+app.use(express.json())
 
 
 app.post('/transacao', async( req, res)=>{
@@ -12,7 +12,7 @@ app.post('/transacao', async( req, res)=>{
         data: {
             description: req.body.description,
             amount: req.body.amount,
-            date: req.body.date
+            date: new Date(req.body.date)
         }
 
     })
@@ -21,14 +21,14 @@ app.post('/transacao', async( req, res)=>{
 
 })
 
-app.get('/transacao', async (req, res) => {
+app.get('/transacao', async(req, res) => {
     let transactions =[]
     if (req.query){
-        transactions = await prisma.transaction,findMany({
-            were:{
+        transactions = await prisma.transaction.findMany({
+            where:{
                 description: req.body.description,
                 amount: req.body.amount,
-                date: req.body.date
+                date: new Date(req.body.date)
             }
         })
 
@@ -38,32 +38,37 @@ app.get('/transacao', async (req, res) => {
     transactions = await prisma.transaction.findMany()
     res.status(200).json(transactions)
 })
-app.listen(3000)
 
-app.put('/transacao/:id', async( req, res)=>{
+
+
+app.put('/transacao/:id', async( req, res) =>{
     await prisma.transaction.update({
         where: {
-            id: req.params.id
+            id: Number.parseInt(req.params.id)
         },
         data: {
             description: req.body.description,
             amount: req.body.amount,
-            date: req.body.date
+            date: new Date(req.body.date)
         }
 
     })
-
     res.status(201).json(req.body)
+
 
 })
 
 app.delete('/transacao/:id', async(req, res)=>{
     await prisma.transaction.delete({
-        were:{
-            id: req.params.id
+        where:{
+            id: Number.parseInt(req.params.id)
 
         },
 
     })
     res.status(200).json({message: 'Usuario deletado com sucesso!'})
+})
+
+app.listen(3000, (p) => {
+    console.log(`test ${p}`)
 })
